@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -16,11 +17,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     Intent intent;
     SpeechRecognizer mRecognizer;
     TextView textView;
+    TextToSpeech tts;
+
+    TagManage tags=new TagManage();//태그를 담고 단어와 태그 를 비교 해주는
     private final int MY_PERMISSIONS_RECORD_AUDIO = 1;
 
     @Override
@@ -53,6 +58,12 @@ public class MainActivity extends AppCompatActivity {
         mRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         mRecognizer.setRecognitionListener(recognitionListener);
 
+        tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                tts.setLanguage(Locale.KOREAN);
+            }
+        });
 
         textView = (TextView) findViewById(R.id.textView);
 
@@ -93,16 +104,17 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        @Override
         public void onResults(Bundle bundle) {
             String key = "";
             key = SpeechRecognizer.RESULTS_RECOGNITION;
             ArrayList<String> mResult = bundle.getStringArrayList(key);
 
-            String[] rs = new String[mResult.size()];
-            mResult.toArray(rs);
+            String[] rs = new String[mResult.size()];//유사단어 여러개 뽑힘
+            mResult.toArray(rs);     //뽑힌 단어 입력
 
-            textView.setText(rs[0]);
+            textView.setText(rs[0]);//가장 정확하다고 생각되는 것 출력
+            // text.append(rs[1]"\n");
+            Answer(rs[0], textView);
         }
 
         @Override
@@ -113,4 +125,24 @@ public class MainActivity extends AppCompatActivity {
         public void onEvent(int i, Bundle bundle) {
         }
     };
+    private void Answer(String input, TextView txt){//음성 합성,재생
+        String mail=input;
+        String note[] = mail.split(" ");// 단어를 띄어쓰기 구분으로 자름
+        String page="";
+        String node="";
+
+        for(int i=0; i<note.length; i++){//글자를 쪼개 단어를 추출 page에 기입
+            node=tags.compare(note[i]);
+            if(node.equals("false")){}
+            else
+                page=page+"#"+node;
+        }
+        Toast.makeText(this, page, Toast.LENGTH_LONG).show();
+       /* try {
+            if(input.equals("")){
+            txt.append("\n");
+            tts.speak(input, TextToSpeech.QUEUE_FLUSH, null);
+            }
+        }catch(Exception e){}*/
+    }
 }
