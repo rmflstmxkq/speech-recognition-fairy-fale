@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     TextView textView;
     TextToSpeech tts;
 
-    TagManage tags=new TagManage();//태그를 담고 단어와 태그 를 비교 해주는
+    TagManage tagManage = new TagManage();//태그를 담고 단어와 태그 를 비교 해주는
     private final int MY_PERMISSIONS_RECORD_AUDIO = 1;
 
     @Override
@@ -34,10 +35,10 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        if (! SpeechRecognizer.isRecognitionAvailable (this)) {
-            Toast.makeText(getApplicationContext(), "미지원", Toast.LENGTH_LONG).show();
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
+            Toast.makeText(getApplicationContext(), "미지원", Toast.LENGTH_LONG).show();//사용 가능한지 확인
         }
-        if (ContextCompat.checkSelfPermission(this,
+        if (ContextCompat.checkSelfPermission(this,//사용권한을 얻기 위한 팝업
                 Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -64,17 +65,16 @@ public class MainActivity extends AppCompatActivity {
                 tts.setLanguage(Locale.KOREAN);
             }
         });
+        textView = (TextView) findViewById(R.id.textView);//택스트 찾아서 인식
 
-        textView = (TextView) findViewById(R.id.textView);
+        Button button = (Button) findViewById(R.id.button01);//버튼 찾아서 인식
 
-        Button button = (Button) findViewById(R.id.button01);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view) {// 버튼 누르며 실행
                 mRecognizer.startListening(intent);
             }
         });
-
     }
 
     private RecognitionListener recognitionListener = new RecognitionListener() {
@@ -101,9 +101,10 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onError(int i) {
             textView.setText("너무 늦게 말하면 오류뜹니다");
-
+            Answer("너무 늦게 말하면 오류뜹니다", textView);
         }
 
+        @Override
         public void onResults(Bundle bundle) {
             String key = "";
             key = SpeechRecognizer.RESULTS_RECOGNITION;
@@ -125,19 +126,28 @@ public class MainActivity extends AppCompatActivity {
         public void onEvent(int i, Bundle bundle) {
         }
     };
-    private void Answer(String input, TextView txt){//음성 합성,재생
-        String mail=input;
-        String note[] = mail.split(" ");// 단어를 띄어쓰기 구분으로 자름
-        String page="";
-        String node="";
 
-        for(int i=0; i<note.length; i++){//글자를 쪼개 단어를 추출 page에 기입
-            node=tags.compare(note[i]);
-            if(node.equals("false")){}
-            else
-                page=page+"#"+node;
+    private void Answer(String input, TextView txt) {//음성 합성,재생
+        String mail = input;
+        String note[] = mail.split(" ");// 단어를 띄어쓰기 구분으로 자름
+        String page = "";
+        String node = "";
+
+        for (int i = 0; i < note.length; i++) {//글자를 쪼개 단어를 추출 page에 기입
+            node = tagManage.Compare(note[i]);
+            if (node.equals("false")) {
+            } else
+                page = page + "#" + node;
         }
-        Toast.makeText(this, page, Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, page, Toast.LENGTH_LONG).show();//테그 출력
+
+        Intent it = new Intent(this, Fairybase.class);
+        it.putExtra("tagmanage", tagManage);
+        startActivity(it);
+
+        // String bb=fdb.;
+        // Toast.makeText(this, bb, Toast.LENGTH_LONG).show();
+
        /* try {
             if(input.equals("")){
             txt.append("\n");
