@@ -1,5 +1,6 @@
-package com.example.rmfls.fairy;
+package com.example.rmfls.speechtest;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -8,33 +9,54 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.rmfls.fairy.R;
 
 public class Fairybase extends AppCompatActivity {
 
-    public static final String TAG = "MainActivity";
-    private static String DATABASE_NAME = "Fairybase";
+
+    public static final String TAG = "Fairybase";
+
+    private static String DATABASE_NAME = "Fairyall";
     private static String TABLE_NAME = "choice";//동화 개수많큼 있어야 함
     private static int DATABASE_VERSION = 1;
     private static DatabaseHelper dbHelper;
     private static SQLiteDatabase db;
+
     static boolean createDb = false;
-    TagManage tagmanage;
+    com.example.rmfls.speechtest.TagManage tagmanage;
+
+    Intent it;
+    int select;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // setContentView(R.layout.activity_main);
 
-        Intent it = getIntent();
-        tagmanage = (TagManage) it.getSerializableExtra("tagmanage");
-
-        if (createDb == false) {
+        if (createDb == false) {//있으면 사용 없으면 생성
+            it = getIntent();
+            tagmanage = (com.example.rmfls.speechtest.TagManage) it.getSerializableExtra("tagmanage");
+            select = it.getExtras().getInt("selectfairy");
             createDb = true;
-            boolean isOpen = openDatabase();//헬퍼 객체화 및 데이터베이스 생성
-            if (isOpen) {
-                executeRawQuery();//데이터 베이스 명령문 사용
+
+            switch (select) {//동화목록
+                case 1:
+                    TABLE_NAME = "rabbit_tortoise";
+                    break;
+                case 2:
+                    TABLE_NAME = "sun_moon";
+                    break;
+                case 3:
+                    TABLE_NAME = "uturi";
+                    break;
             }
-        } else {
+        }
+        boolean isOpen = openDatabase();//헬퍼 객체화 및 데이터베이스 생성
+        if (isOpen) {
             executeRawQuery();
         }
     }
@@ -42,17 +64,25 @@ public class Fairybase extends AppCompatActivity {
     private boolean openDatabase() {
         dbHelper = new DatabaseHelper(this);//헬퍼 생성후 데이터베이스 객체 참조
         db = dbHelper.getWritableDatabase();//실질적으로 여기서 데이터베이스 생성됨
-
         return true;
     }
 
     public void executeRawQuery() {//데이터베이스에 날리는 명령문
-        Cursor c1 = db.rawQuery("select * from " + TABLE_NAME, null);
-        c1.moveToNext();
-
-        //Toast.makeText(this, c1.getString(2), Toast.LENGTH_LONG).show();
-        c1.close();
-
+        try {
+            it = getIntent();
+            String node = it.getStringExtra("ftag");
+            String query = "select * from " + TABLE_NAME +" where ftag=\""+ node + "\";";
+            Cursor c1 = db.rawQuery(query, null);
+             c1.moveToNext();
+             String res = c1.getString(1);//얻은 이미지 경로 이걸 전달해 변경
+             it = new Intent(this, com.example.rmfls.speechtest.MainActivity.class);
+             it.putExtra("fres", res);
+            setResult(Activity.RESULT_OK, it);
+            c1.close();
+            finish();
+        } catch (Exception ex) {
+            Log.e(TAG, "Exception in fairy tagmanage", ex);
+        }
         finish();
     }
 
@@ -73,36 +103,53 @@ public class Fairybase extends AppCompatActivity {
 
             String CREATE_SQL = "create table " + TABLE_NAME + "("//테이블 생성 명령문
                     + " _id integer PRIMARY KEY autoincrement, "
-                    + " respath text, "
-                    + " tag text)";
+                    + " frespath text, "
+                    + " ftag text)";
 
             try {
                 db.execSQL(CREATE_SQL);//테이블 생성
             } catch (Exception ex) {
                 Log.e(TAG, "Exception in CREATE_SQL", ex);
             }
-        }
-
-        void pushBase() {
             try {//데이터 베이스에 입력
-                db.execSQL("insert into " + TABLE_NAME + "(respath, tag) values ('res/11111', '#토끼');");
+                String tag = getResources().getString(R.string.tag);
+                String res = getResources().getString(R.string.res);
+                String[] tags = tag.split(" ");
+                String[] ress = res.split(" ");
+
+                for (int i = 0; i < tags.length; i++) {
+                    String query = "insert into " + TABLE_NAME + " (frespath, ftag) values ('" + ress[i] + "', '" + tags[i] + "');";
+
+                    db.execSQL(query);
+                }
             } catch (Exception ex) {
                 Log.e(TAG, "Exception in insert SQL", ex);
             }
+
+            try {//태그메니저에 태크 넣는 과정
+                Cursor c1 = db.rawQuery("select count(*) as Total from " + TABLE_NAME, null);
+                c1.moveToNext();
+                int count = c1.getInt(0);
+                c1.close();
+
+                Cursor c2 = db.rawQuery("select * from " + TABLE_NAME, null);
+                for (int i = 0; i < count; i++) {
+                    c2.moveToNext();
+                    String tagnote = c2.getString(2);
+                    tagmanage.push(tagnote);
+                }
+                c2.close();
+            } catch (Exception ex) {
+                Log.e(TAG, "Exception in pushTag", ex);
+            }
+        }
+
+        void pushBase() {
+
         }
 
         void pushTag() {//태그메니저한테 테그 전달
-            try{
-                Cursor c1 = db.rawQuery("select * from " + TABLE_NAME, null);
-                int count = c1.getInt(0);
-                for(int i=0;i< count ;i++){
-                    c1.moveToNext();
-                    String tagnote = c1.getString(2);
-                    tagmanage.push(tagnote);
-                }
-            }catch(Exception ex){
-                Log.e(TAG, "Exception in pushTag", ex);
-            }
+
         }
 
         public void onOpen(SQLiteDatabase db) {
@@ -114,4 +161,5 @@ public class Fairybase extends AppCompatActivity {
         }
     }
 }
+
 
