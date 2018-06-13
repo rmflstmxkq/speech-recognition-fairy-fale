@@ -1,4 +1,4 @@
-package com.example.rmfls.speechtest;
+package com.example.rmfls.fairy;
 
 import android.widget.Toast;
 

@@ -1,4 +1,4 @@
-package com.example.rmfls.speechtest;
+package com.example.rmfls.fairy;
 
 import android.app.Activity;
 import android.content.Context;
@@ -28,7 +28,7 @@ public class Fairybase extends AppCompatActivity {
     private static SQLiteDatabase db;
 
     static boolean createDb = false;
-    com.example.rmfls.speechtest.TagManage tagmanage;
+    com.example.rmfls.fairy.TagManage tagmanage;
 
     Intent it;
     int select;
@@ -39,7 +39,7 @@ public class Fairybase extends AppCompatActivity {
 
         if (createDb == false) {//있으면 사용 없으면 생성
             it = getIntent();
-            tagmanage = (com.example.rmfls.speechtest.TagManage) it.getSerializableExtra("tagmanage");
+            tagmanage = (com.example.rmfls.fairy.TagManage) it.getSerializableExtra("tagmanage");
             select = it.getExtras().getInt("selectfairy");
             createDb = true;
 
@@ -75,7 +75,7 @@ public class Fairybase extends AppCompatActivity {
             Cursor c1 = db.rawQuery(query, null);
              c1.moveToNext();
              String res = c1.getString(1);//얻은 이미지 경로 이걸 전달해 변경
-             it = new Intent(this, com.example.rmfls.speechtest.MainActivity.class);
+             it = new Intent(this, com.example.rmfls.fairy.MainActivity.class);
              it.putExtra("fres", res);
             setResult(Activity.RESULT_OK, it);
             c1.close();

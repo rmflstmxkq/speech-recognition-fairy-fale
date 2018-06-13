@@ -1,4 +1,4 @@
-package com.example.rmfls.speechtest;
+package com.example.rmfls.fairy;
 
 import android.Manifest;
 import android.app.Activity;
@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     TextToSpeech tts;
     ImageView image;
 
-    com.example.rmfls.speechtest.TagManage tagManage = new com.example.rmfls.speechtest.TagManage();//태그를 담고 단어와 태그 를 비교 해주는
+    com.example.rmfls.fairy.TagManage tagManage = new com.example.rmfls.fairy.TagManage();//태그를 담고 단어와 태그 를 비교 해주는
     Intent it;
     String fres;
     String fairyName;
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
 
-        it = new Intent(MainActivity.this, com.example.rmfls.speechtest.Fairybase.class);//테그메니저에 태그 입력
+        it = new Intent(MainActivity.this, com.example.rmfls.fairy.Fairybase.class);//테그메니저에 태그 입력
         it.putExtra("tagmanage", tagManage);
         it.putExtra("selectfairy", select);
         startActivity(it);//테그메니저 시작
@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
             node = tagManage.Compare(note[i]);
             if (node.equals("false")) {
             } else {
-                it = new Intent(this, com.example.rmfls.speechtest.Fairybase.class);
+                it = new Intent(this, com.example.rmfls.fairy.Fairybase.class);
                 it.putExtra("ftag", node);
                 startActivityForResult(it, 0);
             }

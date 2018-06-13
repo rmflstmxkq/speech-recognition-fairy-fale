@@ -1,4 +1,4 @@
-package com.example.rmfls.speechtest;
+package com.example.rmfls.fairy;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
+import com.example.rmfls.fairy.R;
 
 public class select extends AppCompatActivity {
 
@@ -36,7 +38,7 @@ public class select extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(page==1) {
-                    Intent intent = new Intent(select.this, MainActivity.class);
+                    Intent intent = new Intent(select.this, com.example.rmfls.fairy.MainActivity.class);
                     intent.putExtra("selectfairy", 1);
                     startActivity(intent);
                 }
