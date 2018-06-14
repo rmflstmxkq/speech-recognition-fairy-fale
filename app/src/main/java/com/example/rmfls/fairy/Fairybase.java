@@ -181,5 +181,3 @@ public class Fairybase extends AppCompatActivity {
         }
     }
 }
-
-

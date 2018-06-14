@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     SpeechRecognizer mRecognizer;
     TextView fairytext;
     TextView speechtext;
+    String prespeechtext="";
+    boolean savetext=false;
     TextToSpeech tts;
     ImageView image;
 
@@ -113,10 +115,10 @@ public class MainActivity extends AppCompatActivity {
                 if (info == true) {
                     rerepage();
                     info = false;
-                    speechtext.setText("");
+                    speechtext.setText(prespeechtext);
+                    savetext=false;
                     Toast.makeText(MainActivity.this, "본화면", Toast.LENGTH_LONG).show();
-                }
-                else {
+                } else {
                     mRecognizer.startListening(intent);//음성인식객체를 음성인식 정보소를 넣어서 실행
                     Toast.makeText(MainActivity.this, "음성인식", Toast.LENGTH_LONG).show();
                 }
@@ -199,6 +201,12 @@ public class MainActivity extends AppCompatActivity {
 
         if (fairytext.getText().toString().equals(input) == true) {
             textpage++;
+            if(fairyName.equals("rabbit_tortoise")){
+                if(textpage>24){
+                    textpage=24;
+                }
+            }
+
             rerepage();
         }
 
@@ -219,6 +227,10 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == 0) {
             if (resultCode == Activity.RESULT_OK) {
+                if(savetext==false){
+                    prespeechtext=speechtext.getText().toString();
+                    savetext=true;
+                }
                 fres = data.getStringExtra("fres");//이미지 이름
                 info(fres);
             }
@@ -230,15 +242,20 @@ public class MainActivity extends AppCompatActivity {
             fairytext.setText(getResources().getString(R.string.토끼와거북01 + textpage));
             if (textpage <= 2) {
                 image.setImageResource(R.drawable.first);
-            }
-            else if (textpage <= 5 && textpage>2) {
+            } else if (textpage <= 5 && textpage > 2) {
                 image.setImageResource(R.drawable.first1);
-            }
-            else if (textpage <= 8 && textpage>5) {
+            } else if (textpage <= 8 && textpage > 5) {
                 image.setImageResource(R.drawable.first2);
-            }
-            else if (textpage <= 11 && textpage>8) {
+            } else if (textpage <= 11 && textpage > 8) {
                 image.setImageResource(R.drawable.second);
+            } else if (textpage <= 14 && textpage > 11) {
+                image.setImageResource(R.drawable.second1);
+            } else if (textpage <= 17 && textpage > 14) {
+                image.setImageResource(R.drawable.second2);
+            } else if (textpage <= 20 && textpage > 17) {
+                image.setImageResource(R.drawable.second3);
+            } else if (textpage > 20) {
+                image.setImageResource(R.drawable.third);
             }
         }
         if (fairyName.equals("sun_moon")) {
