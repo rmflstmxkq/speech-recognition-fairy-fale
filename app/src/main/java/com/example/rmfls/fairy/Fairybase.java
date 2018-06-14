@@ -32,6 +32,7 @@ public class Fairybase extends AppCompatActivity {
 
     Intent it;
     int select;
+    boolean tta=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,6 +143,7 @@ public class Fairybase extends AppCompatActivity {
             } catch (Exception ex) {
                 Log.e(TAG, "Exception in pushTag", ex);
             }
+            tta=true;
         }
 
         void pushBase() {
@@ -153,7 +155,25 @@ public class Fairybase extends AppCompatActivity {
         }
 
         public void onOpen(SQLiteDatabase db) {
+            if(tta==false){
+                tta=true;
+                try {//태그메니저에 태크 넣는 과정
+                    Cursor c1 = db.rawQuery("select count(*) as Total from " + TABLE_NAME, null);
+                    c1.moveToNext();
+                    int count = c1.getInt(0);
+                    c1.close();
 
+                    Cursor c2 = db.rawQuery("select * from " + TABLE_NAME, null);
+                    for (int i = 0; i < count; i++) {
+                        c2.moveToNext();
+                        String tagnote = c2.getString(2);
+                        tagmanage.push(tagnote);
+                    }
+                    c2.close();
+                } catch (Exception ex) {
+                    Log.e(TAG, "Exception in pushTag", ex);
+                }
+            }
         }
 
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

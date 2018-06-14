@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         nextbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (textpage != 23)
+                if (textpage != 24)
                     textpage++;
                 rerepage();
             }
