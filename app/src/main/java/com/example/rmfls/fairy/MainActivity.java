@@ -32,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
     SpeechRecognizer mRecognizer;
     TextView fairytext;
     TextView speechtext;
-    String prespeechtext="";
-    boolean savetext=false;
+    String prespeechtext = "";
+    boolean savetext = false;
     TextToSpeech tts;
     ImageView image;
 
@@ -41,6 +41,10 @@ public class MainActivity extends AppCompatActivity {
     Intent it;
     String fres;
     String fairyName;
+
+    String[] infoS = new String[100];
+    int stackH = 0;
+    int tagS=0;
 
     boolean info = false;
     int textpage = 0;
@@ -113,11 +117,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (info == true) {
-                    rerepage();
-                    info = false;
-                    speechtext.setText(prespeechtext);
-                    savetext=false;
-                    Toast.makeText(MainActivity.this, "본화면", Toast.LENGTH_LONG).show();
+                    if (stackH == 0) {
+                        rerepage();
+                        info = false;
+                        speechtext.setText(prespeechtext);
+                        savetext = false;
+                        Toast.makeText(MainActivity.this, "본화면", Toast.LENGTH_LONG).show();
+                    } else {
+                        info(infoS[--stackH]);
+                    }
                 } else {
                     mRecognizer.startListening(intent);//음성인식객체를 음성인식 정보소를 넣어서 실행
                     Toast.makeText(MainActivity.this, "음성인식", Toast.LENGTH_LONG).show();
@@ -201,14 +209,15 @@ public class MainActivity extends AppCompatActivity {
 
         if (fairytext.getText().toString().equals(input) == true) {
             textpage++;
-            if(fairyName.equals("rabbit_tortoise")){
-                if(textpage>24){
-                    textpage=24;
+            if (fairyName.equals("rabbit_tortoise")) {//페이지 수 제한
+                if (textpage > 24) {
+                    textpage = 24;
                 }
             }
 
             rerepage();
         }
+        fairytext.setText("");
 
         for (int i = 0; i < note.length; i++) {//글자를 쪼개 단어를 추출
             node = tagManage.Compare(note[i]);
@@ -217,6 +226,7 @@ public class MainActivity extends AppCompatActivity {
                 it = new Intent(this, com.example.rmfls.fairy.Fairybase.class);
                 it.putExtra("ftag", node);
                 startActivityForResult(it, 0);
+                tagS++;
             }
         }
     }
@@ -227,13 +237,18 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == 0) {
             if (resultCode == Activity.RESULT_OK) {
-                if(savetext==false){
-                    prespeechtext=speechtext.getText().toString();
-                    savetext=true;
+                if (savetext == false) {
+                    prespeechtext = speechtext.getText().toString();
+                    savetext = true;
                 }
                 fres = data.getStringExtra("fres");//이미지 이름
-                info(fres);
+                infoS[stackH++] = fres;
+                info = true;
             }
+        }
+        if(stackH==tagS){
+            tagS=0;
+            info(infoS[--stackH]);
         }
     }
 
@@ -276,6 +291,5 @@ public class MainActivity extends AppCompatActivity {
                 image.setImageResource(R.drawable.tortoise);
                 break;
         }
-        info = true;
     }
 }
