@@ -217,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
 
             rerepage();
         }
-        fairytext.setText("");
+        //fairytext.setText("");
 
         for (int i = 0; i < note.length; i++) {//글자를 쪼개 단어를 추출
             node = tagManage.Compare(note[i]);
